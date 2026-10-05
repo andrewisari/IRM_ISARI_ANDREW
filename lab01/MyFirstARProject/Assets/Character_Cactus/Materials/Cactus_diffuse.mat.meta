@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bcfe827ba457ac44e9c86df6af3a22db
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 32933
+  packageName: Character Cactus
+  packageVersion: 1
+  assetPath: Assets/Character_Cactus/Materials/Cactus_diffuse.mat
+  uploadId: 55793
