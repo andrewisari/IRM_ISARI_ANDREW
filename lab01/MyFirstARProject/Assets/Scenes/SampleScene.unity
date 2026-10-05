@@ -119,12 +119,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &304102539 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100052, guid: 68d8f3eae01c5744b996aab3358db0a0,
+    type: 3}
+  m_PrefabInstance: {fileID: 1822043758}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &304102540 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400052, guid: 68d8f3eae01c5744b996aab3358db0a0,
     type: 3}
   m_PrefabInstance: {fileID: 1822043758}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &304102542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304102539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9754db2641610ae4e90dd50949307b44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterProximity
+  opponent: {fileID: 1516409820}
+  ownTarget: {fileID: 2117610804}
+  opponentTarget: {fileID: 1640866709}
+  attackDistance: 0.25
+  releaseDistance: 0.3
+  faceOpponent: 1
+  turnSpeed: 5
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -372,14 +397,43 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100052, guid: 68d8f3eae01c5744b996aab3358db0a0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1516409822}
   m_SourcePrefab: {fileID: 100100000, guid: 68d8f3eae01c5744b996aab3358db0a0, type: 3}
+--- !u!1 &1516409819 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100052, guid: 68d8f3eae01c5744b996aab3358db0a0,
+    type: 3}
+  m_PrefabInstance: {fileID: 1282277108}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1516409820 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400052, guid: 68d8f3eae01c5744b996aab3358db0a0,
     type: 3}
   m_PrefabInstance: {fileID: 1282277108}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1516409822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1516409819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9754db2641610ae4e90dd50949307b44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterProximity
+  opponent: {fileID: 304102540}
+  ownTarget: {fileID: 1640866709}
+  opponentTarget: {fileID: 2117610804}
+  attackDistance: 0.25
+  releaseDistance: 0.3
+  faceOpponent: 1
+  turnSpeed: 5
 --- !u!1 &1640866706
 GameObject:
   m_ObjectHideFlags: 0
@@ -741,7 +795,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100052, guid: 68d8f3eae01c5744b996aab3358db0a0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 304102542}
   m_SourcePrefab: {fileID: 100100000, guid: 68d8f3eae01c5744b996aab3358db0a0, type: 3}
 --- !u!1 &2117610801
 GameObject:
