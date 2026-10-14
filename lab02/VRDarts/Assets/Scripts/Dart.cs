@@ -3,27 +3,13 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
-/// <summary>
-/// A throwable dart. It is grabbed through an XRGrabInteractable (Select / Grip),
-/// flies tip-first after release, sticks into the DartBoard and reports the hit.
-/// Darts that miss, or that have been scored, return to their spawn point.
-/// </summary>
 [RequireComponent(typeof(Rigidbody), typeof(XRGrabInteractable))]
 public class Dart : MonoBehaviour
 {
-    [Tooltip("Distance from the pivot to the tip of the dart along +Z.")]
     public float tipOffset = 0.1f;
-
-    [Tooltip("How deep the tip sinks into the board when it sticks.")]
     public float penetration = 0.02f;
-
-    [Tooltip("Minimum speed needed for the dart to stick into the board.")]
     public float minStickSpeed = 1.0f;
-
-    [Tooltip("Seconds a scored dart stays in the board before returning.")]
     public float stuckReturnDelay = 3f;
-
-    [Tooltip("Seconds a missed dart lies around before returning.")]
     public float missReturnDelay = 2f;
 
     Rigidbody m_Body;
@@ -66,8 +52,6 @@ public class Dart : MonoBehaviour
 
     void OnReleased(SelectExitEventArgs args)
     {
-        // The throw event: remember where the player released the dart from,
-        // the board uses it for the distance multiplier.
         m_ReleasePosition = transform.position;
         m_InFlight = true;
         m_Landed = false;
@@ -80,7 +64,6 @@ public class Dart : MonoBehaviour
 
         m_LastVelocity = m_Body.linearVelocity;
 
-        // Keep the tip pointing along the flight path, like a real dart.
         if (m_LastVelocity.sqrMagnitude > 0.5f)
         {
             m_Body.MoveRotation(Quaternion.LookRotation(m_LastVelocity.normalized, Vector3.up));
@@ -103,7 +86,6 @@ public class Dart : MonoBehaviour
             return;
         }
 
-        // Hit the floor, a wall, or the board too slowly: it is a miss.
         m_Landed = true;
         m_InFlight = false;
         if (ScoreManager.Instance != null)
@@ -122,7 +104,6 @@ public class Dart : MonoBehaviour
         transform.position = contactPoint - direction * (tipOffset - penetration);
         transform.SetParent(board.transform, true);
 
-        // A dart stuck in the board can't be grabbed until it comes back to the table.
         m_Grab.enabled = false;
 
         board.RegisterHit(contactPoint, m_ReleasePosition);

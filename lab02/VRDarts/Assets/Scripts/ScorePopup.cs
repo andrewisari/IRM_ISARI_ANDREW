@@ -1,9 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Floating world-space score text that rises, faces the player, grows and fades out.
-/// </summary>
 public class ScorePopup : MonoBehaviour
 {
     public float lifetime = 1.5f;
@@ -63,7 +60,6 @@ public class ScorePopup : MonoBehaviour
         if (cam != null)
             transform.rotation = Quaternion.LookRotation(transform.position - cam.transform.position, Vector3.up);
 
-        // Pop in, then fade out.
         var scale = Mathf.Lerp(0.0015f, 0.0025f, Mathf.Clamp01(t * 6f));
         transform.localScale = Vector3.one * scale;
         var c = m_Color;

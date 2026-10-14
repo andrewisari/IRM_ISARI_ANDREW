@@ -18,10 +18,6 @@ using UnityEngine.XR.OpenXR.Features;
 using UnityEngine.XR.OpenXR.Features.Interactions;
 using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
 
-/// <summary>
-/// One-click project setup: configures OpenXR in XR Plug-in Management and builds the darts scene.
-/// Menu: VR Darts > Configure OpenXR / Build Darts Scene. Batch mode: -executeMethod VRDartsSetup.SetupAll
-/// </summary>
 public static class VRDartsSetup
 {
     const string k_ScenePath = "Assets/Scenes/DartsScene.unity";
@@ -39,8 +35,6 @@ public static class VRDartsSetup
         BuildScene();
     }
 
-    // ---------------------------------------------------------------- XR settings
-
     [MenuItem("VR Darts/Configure OpenXR")]
     public static void ConfigureOpenXR()
     {
@@ -52,7 +46,6 @@ public static class VRDartsSetup
             EditorBuildSettings.AddConfigObject(XRGeneralSettings.k_SettingsKey, perTarget, true);
         }
 
-        // OpenXR package settings are created lazily by the package's editor UI, so create them explicitly.
         var packageSettingsType = typeof(FeatureHelpers).Assembly.GetType("UnityEditor.XR.OpenXR.OpenXRPackageSettings");
         packageSettingsType?.GetMethod("GetOrCreateInstance")?.Invoke(null, null);
 
@@ -103,8 +96,6 @@ public static class VRDartsSetup
         EditorUtility.SetDirty(feature);
     }
 
-    // ---------------------------------------------------------------- Scene
-
     [MenuItem("VR Darts/Build Darts Scene")]
     public static void BuildScene()
     {
@@ -114,7 +105,6 @@ public static class VRDartsSetup
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
-        // Lighting
         RenderSettings.ambientMode = AmbientMode.Skybox;
         var sun = new GameObject("Directional Light").AddComponent<Light>();
         sun.type = LightType.Directional;
@@ -132,7 +122,6 @@ public static class VRDartsSetup
         spot.transform.position = new Vector3(0f, 2.9f, 1.4f);
         spot.transform.LookAt(k_BoardCenter);
 
-        // XR core: interaction manager, rig, simulator, XR-aware event system
         new GameObject("XR Interaction Manager").AddComponent<XRInteractionManager>();
 
         var rig = InstantiatePrefab(k_XROriginPrefab);
@@ -179,7 +168,6 @@ public static class VRDartsSetup
         CreateBox("Left Wall", root, new Vector3(-3.5f, 2f, 0f), new Vector3(0.2f, 4f, 6f), Mat("Wall"));
         CreateBox("Right Wall", root, new Vector3(3.5f, 2f, 0f), new Vector3(0.2f, 4f, 6f), Mat("Wall"));
 
-        // Throw distance zones: the further back the player throws from, the higher the multiplier.
         foreach (var zone in DartBoard.DefaultZones)
         {
             if (zone.minDistance <= 0f)
@@ -192,30 +180,28 @@ public static class VRDartsSetup
 
             var label = CreateWorldCanvas($"Zone Label x{zone.multiplier:0.#}", root, new Vector3(-1.1f, 0.005f, z - 0.2f),
                 Quaternion.Euler(90f, 0f, 0f), new Vector2(400, 120), 0.002f);
-            AddText(label.transform, "Label", font, $"x{zone.multiplier:0.#} behind this line", 44, color, TextAnchor.MiddleCenter, FontStyle.Bold);
+            AddText(label.transform, "Label", font, $"x{zone.multiplier:0.#}", 44, color, TextAnchor.MiddleCenter, FontStyle.Bold);
         }
     }
 
     static GameObject BuildBoard(Font font)
     {
         var boardGo = new GameObject("DartBoard");
-        boardGo.transform.SetPositionAndRotation(k_BoardCenter, Quaternion.Euler(0f, 180f, 0f)); // +Z faces the player
+        boardGo.transform.SetPositionAndRotation(k_BoardCenter, Quaternion.Euler(0f, 180f, 0f));
         var board = boardGo.AddComponent<DartBoard>();
         board.radius = k_BoardRadius;
         board.popupFont = font;
 
-        // Cabinet / backing. Its front face is flush with the rings, darts stick into it.
         var cabinet = CreateBox("Cabinet", boardGo.transform, new Vector3(0f, 0f, -0.03f), new Vector3(0.8f, 0.8f, 0.06f),
             Mat("Cabinet", new Color(0.25f, 0.13f, 0.06f), 0.4f));
         Object.DestroyImmediate(cabinet.GetComponent<Collider>());
         var faceCollider = boardGo.AddComponent<BoxCollider>();
         faceCollider.center = new Vector3(0f, 0f, -0.02f);
-        faceCollider.size = new Vector3(0.8f, 0.8f, 0.07f); // front face at z = 0.015, level with the rings
+        faceCollider.size = new Vector3(0.8f, 0.8f, 0.07f);
 
         var surround = CreateDisc("Number Ring", boardGo.transform, k_BoardRadius * 1.22f, 0.025f, Mat("Board Surround", new Color(0.05f, 0.05f, 0.05f)));
         surround.transform.localPosition = new Vector3(0f, 0f, -0.01f);
 
-        // Concentric scoring rings, outermost first, each slightly in front of the previous one.
         var rings = DartBoard.DefaultRings;
         board.rings = (DartBoard.Ring[])rings.Clone();
         board.ringRenderers = new Renderer[rings.Length];
@@ -227,12 +213,10 @@ public static class VRDartsSetup
             board.ringRenderers[i] = disc.GetComponent<Renderer>();
         }
 
-        // Point values printed around the board.
         var legend = CreateWorldCanvas("Board Legend", boardGo.transform, new Vector3(0f, k_BoardRadius * 1.22f + 0.1f, 0.02f),
             Quaternion.Euler(0f, 180f, 0f), new Vector2(800, 80), 0.002f);
-        AddText(legend.transform, "Text", font, "Bull 50 · 25 · 20 · 15 · 12 · 10 · 7 · 5 · 2", 32, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
+        AddText(legend.transform, "Text", font, "50  25  20  15  12  10  7  5  2", 32, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
 
-        // Hit particles, re-positioned and emitted by the board on each hit.
         var particlesGo = new GameObject("Hit Particles");
         particlesGo.transform.SetParent(boardGo.transform, false);
         var ps = particlesGo.AddComponent<ParticleSystem>();
@@ -298,14 +282,13 @@ public static class VRDartsSetup
     {
         var dart = new GameObject(name);
         dart.transform.SetParent(parent);
-        dart.transform.SetPositionAndRotation(position, Quaternion.identity); // tip points along +Z
+        dart.transform.SetPositionAndRotation(position, Quaternion.identity);
         dart.layer = 0;
 
         var metal = Mat("Dart Metal", new Color(0.8f, 0.8f, 0.85f), 0.85f, null, 0.9f);
         var barrel = Mat("Dart Barrel", new Color(0.15f, 0.15f, 0.17f), 0.7f, null, 0.8f);
         var flight = Mat("Flight " + ColorUtility.ToHtmlStringRGB(flightColor), flightColor, 0.3f);
 
-        // Visual parts (no colliders); a single capsule + tail box on the root handle physics.
         CreateVisual(PrimitiveType.Cylinder, "Tip", dart.transform, new Vector3(0f, 0f, 0.07f), new Vector3(0.004f, 0.03f, 0.004f), Quaternion.Euler(90f, 0f, 0f), metal);
         CreateVisual(PrimitiveType.Capsule, "Barrel", dart.transform, new Vector3(0f, 0f, 0.015f), new Vector3(0.016f, 0.04f, 0.016f), Quaternion.Euler(90f, 0f, 0f), barrel);
         CreateVisual(PrimitiveType.Cylinder, "Shaft", dart.transform, new Vector3(0f, 0f, -0.04f), new Vector3(0.006f, 0.03f, 0.006f), Quaternion.Euler(90f, 0f, 0f), flight);
@@ -316,7 +299,7 @@ public static class VRDartsSetup
         capsule.direction = 2;
         capsule.radius = 0.01f;
         capsule.height = 0.2f;
-        var tail = dart.AddComponent<BoxCollider>(); // stops the dart rolling off the table
+        var tail = dart.AddComponent<BoxCollider>();
         tail.center = new Vector3(0f, 0f, -0.075f);
         tail.size = new Vector3(0.04f, 0.04f, 0.035f);
 
@@ -363,12 +346,12 @@ public static class VRDartsSetup
         Place(title.rectTransform, 0f, -18f, 560, 60);
         var total = AddText(canvasGo.transform, "Total", font, "SCORE: 0", 64, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
         Place(total.rectTransform, 0f, -90f, 560, 80);
-        var last = AddText(canvasGo.transform, "Last Throw", font, "Grab a dart and throw it at the board!", 28, new Color(0.7f, 0.95f, 1f), TextAnchor.MiddleCenter, FontStyle.Normal);
+        var last = AddText(canvasGo.transform, "Last Throw", font, "Throw a dart", 28, new Color(0.7f, 0.95f, 1f), TextAnchor.MiddleCenter, FontStyle.Normal);
         Place(last.rectTransform, 0f, -170f, 560, 70);
         var stats = AddText(canvasGo.transform, "Stats", font, "Darts thrown: 0   Hits: 0   Best throw: 0", 24, new Color(0.85f, 0.85f, 0.85f), TextAnchor.MiddleCenter, FontStyle.Normal);
         Place(stats.rectTransform, 0f, -230f, 560, 40);
         var rules = AddText(canvasGo.transform, "Rules", font,
-            "Closer to the centre = more points.\nThrow from behind the floor lines for x1.5 / x2.", 20,
+            "Closer to centre = more points\nBehind lines: x1.5 / x2", 20,
             new Color(0.6f, 0.65f, 0.75f), TextAnchor.MiddleCenter, FontStyle.Italic);
         Place(rules.rectTransform, 0f, -285f, 560, 60);
 
@@ -388,8 +371,6 @@ public static class VRDartsSetup
         scoreManager.statsText = stats;
         UnityEventTools.AddPersistentListener(buttonGo.GetComponent<Button>().onClick, scoreManager.ResetScore);
     }
-
-    // ---------------------------------------------------------------- Helpers
 
     static Material Mat(string name, Color? color = null, float smoothness = 0.2f, Color? emission = null, float metallic = 0f)
     {
@@ -431,7 +412,7 @@ public static class VRDartsSetup
         go.name = name;
         Object.DestroyImmediate(go.GetComponent<Collider>());
         go.transform.SetParent(parent, false);
-        go.transform.localRotation = Quaternion.Euler(90f, 0f, 0f); // cylinder axis along the board normal
+        go.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
         go.transform.localScale = new Vector3(radius * 2f, thickness * 0.5f, radius * 2f);
         go.GetComponent<Renderer>().sharedMaterial = material;
         return go;

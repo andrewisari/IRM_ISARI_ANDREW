@@ -1,9 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Keeps the game score and shows it on the world-space scoreboard.
-/// </summary>
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
@@ -20,7 +17,7 @@ public class ScoreManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        Refresh("Grab a dart and throw it at the board!");
+        Refresh("Throw a dart");
     }
 
     void OnDestroy()
@@ -43,7 +40,7 @@ public class ScoreManager : MonoBehaviour
     public void RegisterMiss()
     {
         m_Throws++;
-        Refresh("Missed the board! 0 points");
+        Refresh("Miss: 0");
     }
 
     public void ResetScore()
@@ -51,7 +48,7 @@ public class ScoreManager : MonoBehaviour
         m_Total = m_Throws = m_Hits = m_Best = 0;
         foreach (var dart in FindObjectsByType<Dart>(FindObjectsSortMode.None))
             dart.ReturnToSpawn();
-        Refresh("Score reset. Good luck!");
+        Refresh("Score reset");
     }
 
     void Refresh(string lastThrow)

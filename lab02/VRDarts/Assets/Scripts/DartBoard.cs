@@ -2,19 +2,12 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Scores a dart hit by its distance from the centre of the board, multiplied by
-/// how far away the player threw from, and plays the hit feedback
-/// (particles, ring flash, sound, floating score text).
-/// The board faces along its local +Z axis.
-/// </summary>
 public class DartBoard : MonoBehaviour
 {
     [Serializable]
     public struct Ring
     {
         public string name;
-        [Tooltip("Outer radius as a fraction of the board radius.")]
         public float outerRadius;
         public int points;
         public Color color;
@@ -23,12 +16,10 @@ public class DartBoard : MonoBehaviour
     [Serializable]
     public struct DistanceZone
     {
-        [Tooltip("Minimum throw distance (metres) for this multiplier.")]
         public float minDistance;
         public float multiplier;
     }
 
-    // Shared with the editor scene builder so the visuals always match the scoring.
     public static readonly Ring[] DefaultRings =
     {
         new Ring { name = "BULLSEYE",   outerRadius = 0.06f, points = 50, color = new Color(0.85f, 0.10f, 0.10f) },
@@ -49,14 +40,12 @@ public class DartBoard : MonoBehaviour
         new DistanceZone { minDistance = 3.0f, multiplier = 2f },
     };
 
-    [Tooltip("Radius of the scoring area in metres.")]
     public float radius = 0.25f;
 
     public Ring[] rings = (Ring[])DefaultRings.Clone();
     public DistanceZone[] zones = (DistanceZone[])DefaultZones.Clone();
 
     [Header("Feedback")]
-    [Tooltip("One renderer per ring, in the same order as Rings. Flashed on hit.")]
     public Renderer[] ringRenderers;
     public ParticleSystem hitParticles;
     public AudioSource audioSource;
@@ -71,7 +60,6 @@ public class DartBoard : MonoBehaviour
         m_BullClip = CreateTone("Bull", 990f, 0.45f);
     }
 
-    /// <summary>Called by a Dart when it sticks into the board.</summary>
     public void RegisterHit(Vector3 worldPoint, Vector3 throwOrigin)
     {
         var center = transform.position;
@@ -89,7 +77,6 @@ public class DartBoard : MonoBehaviour
             }
         }
 
-        // Throw distance measured on the floor plane, from where the dart was released.
         var throwDistance = Vector3.ProjectOnPlane(center - throwOrigin, Vector3.up).magnitude;
         var multiplier = GetMultiplier(throwDistance);
 
@@ -147,7 +134,6 @@ public class DartBoard : MonoBehaviour
         const float duration = 0.6f;
         for (var t = 0f; t < duration; t += Time.deltaTime)
         {
-            // Two quick pulses towards white with an emissive glow.
             var k = Mathf.Abs(Mathf.Sin(t / duration * Mathf.PI * 2f));
             material.color = Color.Lerp(baseColor, Color.white, k);
             material.SetColor("_EmissionColor", Color.Lerp(Color.black, Color.white * 1.5f, k));
@@ -165,7 +151,6 @@ public class DartBoard : MonoBehaviour
         {
             var t = (float)i / sampleRate;
             var envelope = Mathf.Exp(-t * 12f);
-            // A short "thunk" followed by a bell-like ping.
             var thunk = Mathf.Sin(2f * Mathf.PI * 120f * t) * Mathf.Exp(-t * 60f);
             var ping = Mathf.Sin(2f * Mathf.PI * frequency * t) + 0.4f * Mathf.Sin(2f * Mathf.PI * frequency * 1.5f * t);
             samples[i] = 0.5f * thunk + 0.25f * ping * envelope;
